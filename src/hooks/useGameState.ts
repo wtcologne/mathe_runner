@@ -8,6 +8,7 @@ import {
 } from "./useTaskGenerator";
 
 export type GameStatus = "title" | "setup" | "playing" | "training" | "gameOver";
+export type GameResult = "won" | "lost" | null;
 
 export interface ScoreFeedback {
   id: string;
@@ -38,6 +39,7 @@ export const useGameState = () => {
   );
   const [pulseKey, setPulseKey] = useState(0);
   const [shakeKey, setShakeKey] = useState(0);
+  const [gameResult, setGameResult] = useState<GameResult>(null);
   const pulseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isTraining = status === "training";
@@ -56,6 +58,7 @@ export const useGameState = () => {
     setSolutionText(null);
     setPulseKey(0);
     setShakeKey(0);
+    setGameResult(null);
   }, []);
 
   const startSession = useCallback(() => {
@@ -107,12 +110,19 @@ export const useGameState = () => {
       setRecentResult(isCorrect ? "correct" : "wrong");
 
       let willEnd = false;
+      let endResult: GameResult = null;
 
       if (!isTraining) {
         const delta = isCorrect ? 10 : -5;
         setScore((prev) => {
           const updated = Math.max(0, prev + delta);
-          willEnd = updated === 0;
+          if (updated === 0) {
+            willEnd = true;
+            endResult = "lost";
+          } else if (updated >= 100) {
+            willEnd = true;
+            endResult = "won";
+          }
           return updated;
         });
         setFeedback({
@@ -135,6 +145,7 @@ export const useGameState = () => {
       }
 
       if (willEnd) {
+        setGameResult(endResult);
         setStatus("gameOver");
         setTask(null);
         return;
@@ -197,6 +208,7 @@ export const useGameState = () => {
     recentResult,
     pulseKey,
     shakeKey,
+    gameResult,
     isTraining,
     isActive,
     sessionLabel,

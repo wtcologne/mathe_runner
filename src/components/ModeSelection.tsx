@@ -105,18 +105,18 @@ export const ModeSelection = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3">
+        <button
+          onClick={onStart}
+          className="rounded-2xl bg-gradient-to-r from-sky-400 via-purple-400 to-pink-400 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-pink-200 transition hover:translate-y-0.5"
+        >
+          Los geht&apos;s!
+        </button>
         <button
           onClick={onBack}
           className="rounded-2xl border border-slate-200 px-6 py-4 font-semibold text-slate-500 transition hover:bg-slate-50"
         >
           Zurück
-        </button>
-        <button
-          onClick={onStart}
-          className="flex-1 rounded-2xl bg-gradient-to-r from-sky-400 via-purple-400 to-pink-400 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-pink-200 transition hover:translate-y-0.5"
-        >
-          Los geht&apos;s!
         </button>
       </div>
     </motion.div>

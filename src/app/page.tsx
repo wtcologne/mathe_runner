@@ -23,6 +23,7 @@ export default function Home() {
     recentResult,
     pulseKey,
     shakeKey,
+    gameResult,
     isTraining,
     isActive,
     selectIntent,
@@ -130,6 +131,7 @@ export default function Home() {
           <GameOverScreen
             score={score}
             stats={stats}
+            result={gameResult}
             onRetry={startSession}
             onBack={backToStart}
           />
