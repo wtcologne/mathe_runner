@@ -74,8 +74,8 @@ export default function Home() {
   }, [moveLane, status]);
 
   return (
-    <main className="relative min-h-screen w-full bg-gradient-to-b from-[#d3f3ff] via-[#eaf6ff] to-[#fff] px-4 py-8 sm:px-8 lg:px-16">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+    <main className="relative min-h-screen w-full bg-gradient-to-b from-[#d3f3ff] via-[#eaf6ff] to-[#fff] px-2 sm:px-4 py-4 sm:py-8 lg:px-16 safe-area-inset">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:gap-8">
         {status === "title" && (
           <StartScreen
             onPlay={() => selectIntent("playing")}

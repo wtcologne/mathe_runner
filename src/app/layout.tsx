@@ -9,9 +9,16 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Mathe-Runner",
+  title: "Math Jump",
   description:
     "Fröhliches Mathe-Laufspiel für Grundschulkinder – trainiere Kopfrechnen in drei Lanes.",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: "cover",
+  },
 };
 
 export default function RootLayout({
@@ -21,6 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de">
+      <head>
+        <meta name="theme-color" content="#eaf6ff" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body
         className={`${fredoka.variable} bg-sky-50 text-slate-900 antialiased`}
       >

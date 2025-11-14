@@ -52,3 +52,17 @@ body {
     radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.25), transparent 45%),
     radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.35), transparent 55%);
 }
+
+/* Safe area für mobile Geräte mit Notch/Browser-UI */
+.safe-area-inset {
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(0.5rem, env(safe-area-inset-left));
+  padding-right: max(0.5rem, env(safe-area-inset-right));
+}
+
+@media (max-width: 640px) {
+  .safe-area-inset {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+}
