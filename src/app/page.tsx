@@ -1,65 +1,140 @@
-import Image from "next/image";
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { StartScreen } from "@/components/StartScreen";
+import { ModeSelection } from "@/components/ModeSelection";
+import { GameCanvas } from "@/components/GameCanvas";
+import { HUD } from "@/components/HUD";
+import { GameOverScreen } from "@/components/GameOverScreen";
+import { useGameState } from "@/hooks/useGameState";
 
 export default function Home() {
+  const {
+    status,
+    sessionIntent,
+    range,
+    operation,
+    score,
+    stats,
+    task,
+    lane,
+    feedback,
+    solutionText,
+    recentResult,
+    pulseKey,
+    shakeKey,
+    isTraining,
+    isActive,
+    selectIntent,
+    setRange,
+    setOperation,
+    moveLane,
+    setLaneDirectly,
+    startSession,
+    backToStart,
+    resolveCurrentTask,
+    setStatus,
+  } = useGameState();
+
+  const [isPaused, setIsPaused] = useState(false);
+
+  const handleCheckpoint = useCallback(() => {
+    if (!isActive || isPaused) {
+      return;
+    }
+    resolveCurrentTask(lane);
+  }, [isActive, isPaused, lane, resolveCurrentTask]);
+
+  const togglePause = useCallback(() => {
+    setIsPaused((prev) => !prev);
+  }, []);
+
+  const handleBackToStart = useCallback(() => {
+    setIsPaused(false);
+    backToStart();
+  }, [backToStart]);
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => {
+      if (!(status === "playing" || status === "training")) {
+        return;
+      }
+      if (["ArrowLeft", "a", "A"].includes(event.key)) {
+        event.preventDefault();
+        moveLane("left");
+      }
+      if (["ArrowRight", "d", "D"].includes(event.key)) {
+        event.preventDefault();
+        moveLane("right");
+      }
+    };
+
+    window.addEventListener("keydown", listener);
+    return () => window.removeEventListener("keydown", listener);
+  }, [moveLane, status]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <main className="relative min-h-screen w-full bg-gradient-to-b from-[#d3f3ff] via-[#eaf6ff] to-[#fff] px-4 py-8 sm:px-8 lg:px-16">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+        {status === "title" && (
+          <StartScreen
+            onPlay={() => selectIntent("playing")}
+            onTraining={() => selectIntent("training")}
+            onOpenSettings={() => {}}
+          />
+        )}
+
+        {status === "setup" && (
+          <ModeSelection
+            range={range}
+            operation={operation}
+            sessionType={sessionIntent}
+            onRangeChange={setRange}
+            onOperationChange={setOperation}
+            onStart={startSession}
+            onBack={backToStart}
+          />
+        )}
+
+        {(status === "playing" || status === "training") && (
+          <>
+            <HUD
+              score={score}
+              stats={stats}
+              task={task}
+              isTraining={isTraining}
+              solutionText={solutionText}
+              feedback={feedback}
+              onHome={handleBackToStart}
+              onPause={togglePause}
+              isPaused={isPaused}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            <GameCanvas
+              key={task?.id ?? "runner"}
+              task={task}
+              lane={lane}
+              isActive={isActive && !isPaused}
+              isTraining={isTraining}
+              pulseKey={pulseKey}
+              shakeKey={shakeKey}
+              feedback={feedback}
+              recentResult={recentResult}
+              correctCount={stats.correct}
+              onReachCheckpoint={handleCheckpoint}
+              onLaneClick={setLaneDirectly}
+            />
+          </>
+        )}
+
+        {status === "gameOver" && (
+          <GameOverScreen
+            score={score}
+            stats={stats}
+            onRetry={startSession}
+            onBack={backToStart}
+          />
+        )}
+      </div>
+    </main>
   );
 }
